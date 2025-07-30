@@ -1,5 +1,6 @@
 package com.gabrielbatista.freteapi.service;
 
+import com.gabrielbatista.freteapi.exception.FreteNaoEncontradoException;
 import com.gabrielbatista.freteapi.model.Frete;
 import com.gabrielbatista.freteapi.repository.FreteRepository;
 import com.gabrielbatista.freteapi.exception.UfDuplicadaException;
@@ -44,12 +45,16 @@ public class FreteService {
     }
 
     public Frete atualizarFrete(Long id, Frete novoFrete) {
-        return freteRepository.findById(id)
-                .map(frete -> {
-                    frete.setUf(novoFrete.getUf());
-                    frete.setValor(novoFrete.getValor());
-                    return freteRepository.save(frete);
-                })
-                .orElseThrow(() -> new RuntimeException("Frete não encontrado com ID: " + id));
+        Optional<Frete> freteOptional = freteRepository.findById(id);
+
+        if (freteOptional.isPresent()) {
+            Frete frete = freteOptional.get();
+            frete.setUf(novoFrete.getUf());
+            frete.setValor(novoFrete.getValor());
+            return freteRepository.save(frete);
+        } else {
+            throw new FreteNaoEncontradoException(id);
+        }
     }
+
 }
