@@ -1,5 +1,6 @@
 package com.gabrielbatista.freteapi.controller;
 
+import com.gabrielbatista.freteapi.dto.FreteResponseDTO;
 import com.gabrielbatista.freteapi.model.Frete;
 import com.gabrielbatista.freteapi.service.FreteService;
 import org.springframework.http.ResponseEntity;
@@ -29,11 +30,12 @@ public class FreteController {
     }
 
     @GetMapping("/uf/{uf}")
-    public ResponseEntity<Frete> buscarPorUf(@PathVariable String uf) {
-        return freteService.buscarPorUf(uf)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<FreteResponseDTO> buscarPorUf(@PathVariable String uf){
+        Frete frete = freteService.buscarPorUf(uf);
+        FreteResponseDTO dto = new FreteResponseDTO(frete.getUf(), frete.getValor());
+        return ResponseEntity.ok(dto);
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Frete> atualizar(@PathVariable Long id, @RequestBody Frete frete) {

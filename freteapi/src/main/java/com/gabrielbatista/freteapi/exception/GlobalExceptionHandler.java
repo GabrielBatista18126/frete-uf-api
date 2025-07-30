@@ -17,4 +17,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Erro interno: " + ex.getMessage());
     }
+    @ExceptionHandler(UfNaoEncontradaException.class)
+    public ResponseEntity<String> handleUfNaoEncontrada(UfNaoEncontradaException ex) {
+        return ResponseEntity.status(404).body(ex.getMessage());
+    }
 }

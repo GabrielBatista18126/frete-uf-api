@@ -3,6 +3,7 @@ package com.gabrielbatista.freteapi.service;
 import com.gabrielbatista.freteapi.model.Frete;
 import com.gabrielbatista.freteapi.repository.FreteRepository;
 import com.gabrielbatista.freteapi.exception.UfDuplicadaException;
+import com.gabrielbatista.freteapi.exception.UfNaoEncontradaException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,8 +29,14 @@ public class FreteService {
         return freteRepository.findAll();
     }
 
-    public Optional<Frete> buscarPorUf(String uf) {
-        return freteRepository.findByUf(uf.toUpperCase());
+    public Frete buscarPorUf(String uf) {
+        Optional<Frete> resultado = freteRepository.findByUf(uf.toUpperCase());
+
+        if (resultado.isPresent()) {
+            return resultado.get();
+        } else {
+            throw new UfNaoEncontradaException(uf);
+        }
     }
 
     public void deletarPorId(Long id) {
