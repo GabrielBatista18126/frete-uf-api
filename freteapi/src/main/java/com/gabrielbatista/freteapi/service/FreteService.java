@@ -20,12 +20,18 @@ public class FreteService {
     }
 
     public Frete cadastrarFrete(Frete frete) {
-        if (freteRepository.existsByUf(frete.getUf())) {
-            throw new UfDuplicadaException(frete.getUf());
+        String uf = frete.getUf();
+
+        if (uf == null || uf.length() != 2) {
+            throw new IllegalArgumentException("UF deve ter exatamente 2 caracteres.");
         }
+
+        if (freteRepository.existsByUf(uf)) {
+            throw new UfDuplicadaException(uf);
+        }
+
         return freteRepository.save(frete);
     }
-
     public List<Frete> listarTodos() {
         return freteRepository.findAll();
     }
@@ -45,8 +51,10 @@ public class FreteService {
     }
 
     public Frete atualizarFrete(Long id, Frete novoFrete) {
+        if (novoFrete.getUf() == null || novoFrete.getUf().length() != 2) {
+            throw new IllegalArgumentException("UF deve ter exatamente 2 caracteres.");
+        }
         Optional<Frete> freteOptional = freteRepository.findById(id);
-
         if (freteOptional.isPresent()) {
             Frete frete = freteOptional.get();
             frete.setUf(novoFrete.getUf());
@@ -56,5 +64,6 @@ public class FreteService {
             throw new FreteNaoEncontradoException(id);
         }
     }
+
 
 }
