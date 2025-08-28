@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/fretes")
@@ -23,41 +22,49 @@ public class FreteController {
 
     @PostMapping
     public ResponseEntity<FreteResponseDTO> cadastrarFrete(@RequestBody @Valid FreteRequestDTO dto) {
-        Frete frete = new Frete();
-        frete.setUf(dto.getUf()); // O DTO já valida o tamanho
-        frete.setValor(dto.getValor());
-
-        Frete salvo = freteService.cadastrarFrete(frete);
-
-        return ResponseEntity.ok(new FreteResponseDTO(salvo.getUf(), salvo.getValor()));
+        FreteResponseDTO salvo = freteService.cadastrarFrete(dto);
+        return ResponseEntity.ok(salvo);
     }
 
+    // Atualiza por id do frete (mantida)
     @PutMapping("/{id}")
-    public ResponseEntity<FreteResponseDTO> atualizarFrete(@PathVariable Long id, @RequestBody @Valid FreteRequestDTO dto) {
-        Frete frete = new Frete();
-        frete.setUf(dto.getUf());
-        frete.setValor(dto.getValor());
-
-        Frete atualizado = freteService.atualizarFrete(id, frete);
-
-        return ResponseEntity.ok(new FreteResponseDTO(atualizado.getUf(), atualizado.getValor()));
+    public ResponseEntity<FreteResponseDTO> atualizarFrete(@PathVariable Long id,
+                                                           @RequestBody @Valid FreteRequestDTO dto) {
+        FreteResponseDTO atualizado = freteService.atualizarFrete(id, dto);
+        return ResponseEntity.ok(atualizado);
     }
 
     @GetMapping
     public ResponseEntity<List<FreteResponseDTO>> listarTodos() {
-        List<Frete> fretes = freteService.listarTodos();
-
-        List<FreteResponseDTO> dtos = fretes.stream()
-                .map(f -> new FreteResponseDTO(f.getUf(), f.getValor()))
-                .collect(Collectors.toList());
-
+        List<FreteResponseDTO> dtos = freteService.listarTodos()
+                .stream()
+                .map(f -> new FreteResponseDTO(
+                        f.getId(),
+                        f.getUf().getId(),
+                        f.getUf().getSigla(),
+                        f.getUf().getNome(),
+                        f.getValor()))
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 
+    // Busca por sigla (mantida para compatibilidade)
     @GetMapping("/uf/{uf}")
     public ResponseEntity<FreteResponseDTO> buscarPorUf(@PathVariable String uf) {
-        Frete frete = freteService.buscarPorUf(uf);
-        return ResponseEntity.ok(new FreteResponseDTO(frete.getUf(), frete.getValor()));
+        Frete frete = freteService.buscarPorUfSigla(uf);
+        return ResponseEntity.ok(new FreteResponseDTO(
+                frete.getId(),
+                frete.getUf().getId(),
+                frete.getUf().getSigla(),
+                frete.getUf().getNome(),
+                frete.getValor()
+        ));
+    }
+
+    // Nova: busca por ufId
+    @GetMapping("/uf-id/{ufId}")
+    public ResponseEntity<FreteResponseDTO> buscarPorUfId(@PathVariable Short ufId) {
+        return ResponseEntity.ok(freteService.buscarPorUfId(ufId));
     }
 
     @DeleteMapping("/{id}")

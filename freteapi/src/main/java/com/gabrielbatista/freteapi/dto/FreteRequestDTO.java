@@ -1,24 +1,37 @@
 package com.gabrielbatista.freteapi.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Size;
-
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public class FreteRequestDTO {
 
-    @NotBlank(message = "UF não pode estar em branco.")
-    @Size(min = 2, max = 2, message = "UF deve ter exatamente 2 caracteres.")
-    private String uf;
+    private Short ufId;
 
+    @Size(min = 2, max = 2, message = "UF deve ter 2 letras")
+    private String ufSigla;
+
+    @NotNull
+    @DecimalMin("0.00")
     private BigDecimal valor;
 
-    public String getUf() {
-        return uf;
+    public FreteRequestDTO() {}
+
+    public Short getUfId() {
+        return ufId;
     }
 
-    public void setUf(String uf) {
-        this.uf = uf;
+    public void setUfId(Short ufId) {
+        this.ufId = ufId;
+    }
+
+    public String getUfSigla() {
+        return ufSigla;
+    }
+
+    public void setUfSigla(String ufSigla) {
+        this.ufSigla = ufSigla;
     }
 
     public BigDecimal getValor() {

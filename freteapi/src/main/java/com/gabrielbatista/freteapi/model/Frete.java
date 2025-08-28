@@ -1,27 +1,24 @@
 package com.gabrielbatista.freteapi.model;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
 
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
+@Table(name = "frete", uniqueConstraints = @UniqueConstraint(columnNames = "uf_id"))
 public class Frete {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 2)
-    private String uf;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "uf_id", nullable = false, foreignKey = @ForeignKey(name = "fk_frete_uf"))
+    private Uf uf;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal valor;
 
-    // Getters e Setters
-
+    public Frete() {}
 
     public Long getId() {
         return id;
@@ -31,12 +28,12 @@ public class Frete {
         this.id = id;
     }
 
-    public String getUf() {
+    public Uf getUf() {
         return uf;
     }
 
-    public void setUf(String uf) {
-        this.uf = uf.toUpperCase();
+    public void setUf(Uf uf) {
+        this.uf = uf;
     }
 
     public BigDecimal getValor() {
