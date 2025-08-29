@@ -26,7 +26,6 @@ public class FreteController {
         return ResponseEntity.ok(salvo);
     }
 
-    // Atualiza por id do frete (mantida)
     @PutMapping("/{id}")
     public ResponseEntity<FreteResponseDTO> atualizarFrete(@PathVariable Long id,
                                                            @RequestBody @Valid FreteRequestDTO dto) {
@@ -48,7 +47,6 @@ public class FreteController {
         return ResponseEntity.ok(dtos);
     }
 
-    // Busca por sigla (mantida para compatibilidade)
     @GetMapping("/uf/{uf}")
     public ResponseEntity<FreteResponseDTO> buscarPorUf(@PathVariable String uf) {
         Frete frete = freteService.buscarPorUfSigla(uf);
@@ -61,10 +59,14 @@ public class FreteController {
         ));
     }
 
-    // Nova: busca por ufId
     @GetMapping("/uf-id/{ufId}")
     public ResponseEntity<FreteResponseDTO> buscarPorUfId(@PathVariable Short ufId) {
         return ResponseEntity.ok(freteService.buscarPorUfId(ufId));
+    }
+
+    @GetMapping("/calcular")
+    public ResponseEntity<FreteResponseDTO> calcular(@RequestParam String cep) {
+        return ResponseEntity.ok(freteService.calcularPorCep(cep));
     }
 
     @DeleteMapping("/{id}")

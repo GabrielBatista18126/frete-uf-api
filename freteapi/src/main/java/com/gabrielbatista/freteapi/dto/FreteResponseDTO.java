@@ -21,16 +21,12 @@ public class FreteResponseDTO {
 
     public Long getIdFrete() { return idFrete; }
     public void setIdFrete(Long idFrete) { this.idFrete = idFrete; }
-
     public Short getUfId() { return ufId; }
     public void setUfId(Short ufId) { this.ufId = ufId; }
-
     public String getUfSigla() { return ufSigla; }
     public void setUfSigla(String ufSigla) { this.ufSigla = ufSigla; }
-
     public String getUfNome() { return ufNome; }
     public void setUfNome(String ufNome) { this.ufNome = ufNome; }
-
     public BigDecimal getValor() { return valor; }
     public void setValor(BigDecimal valor) { this.valor = valor; }
 }

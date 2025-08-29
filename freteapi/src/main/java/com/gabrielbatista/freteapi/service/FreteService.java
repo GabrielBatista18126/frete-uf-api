@@ -4,6 +4,7 @@ import com.gabrielbatista.freteapi.dto.FreteRequestDTO;
 import com.gabrielbatista.freteapi.dto.FreteResponseDTO;
 import com.gabrielbatista.freteapi.exception.FreteNaoEncontradoException;
 import com.gabrielbatista.freteapi.exception.UfNaoEncontradaException;
+import com.gabrielbatista.freteapi.integracao.ViaCepClient;
 import com.gabrielbatista.freteapi.model.Frete;
 import com.gabrielbatista.freteapi.model.Uf;
 import com.gabrielbatista.freteapi.repository.FreteRepository;
@@ -17,21 +18,22 @@ public class FreteService {
 
     private final FreteRepository freteRepository;
     private final UfRepository ufRepository;
+    private final ViaCepClient viaCepClient;
 
-    public FreteService(FreteRepository freteRepository, UfRepository ufRepository) {
+    public FreteService(FreteRepository freteRepository,
+                        UfRepository ufRepository,
+                        ViaCepClient viaCepClient) {
         this.freteRepository = freteRepository;
         this.ufRepository = ufRepository;
+        this.viaCepClient = viaCepClient;
     }
 
-    /** Cria frete usando ufId (preferido) ou ufSigla (fallback). A unicidade fica por conta da UNIQUE(uf_id) no banco. */
+    /** Cria frete usando ufId (preferido) ou ufSigla (fallback). */
     public FreteResponseDTO cadastrarFrete(FreteRequestDTO dto) {
         Uf uf = resolveUf(dto);
-
         Frete frete = new Frete();
         frete.setUf(uf);
         frete.setValor(dto.getValor());
-
-        // Se já existir frete para a UF, o banco lança DataIntegrityViolationException (o handler converte para 409).
         Frete salvo = freteRepository.save(frete);
         return toDTO(salvo);
     }
@@ -59,14 +61,21 @@ public class FreteService {
         freteRepository.deleteById(id);
     }
 
-    /** Busca por id da UF (útil para telas com dropdown). */
+    /** Busca por id da UF. */
     public FreteResponseDTO buscarPorUfId(Short ufId) {
         Frete f = freteRepository.findByUf_Id(ufId)
                 .orElseThrow(() -> new UfNaoEncontradaException("id=" + ufId));
         return toDTO(f);
     }
 
-    /** Resolve UF a partir do DTO. */
+    /** Calcula frete a partir do CEP: ViaCEP → UF → frete da UF. */
+    public FreteResponseDTO calcularPorCep(String cep) {
+        String ufSigla = viaCepClient.obterUfPorCep(cep); // ex.: "SC"
+        Frete frete = freteRepository.findByUf_Sigla(ufSigla)
+                .orElseThrow(() -> new UfNaoEncontradaException(ufSigla));
+        return toDTO(frete);
+    }
+
     private Uf resolveUf(FreteRequestDTO dto) {
         if (dto.getUfId() != null) {
             return ufRepository.findById(dto.getUfId())
@@ -79,7 +88,6 @@ public class FreteService {
         throw new IllegalArgumentException("Informe ufId ou ufSigla (2 letras).");
     }
 
-    /** Mapeia entidade -> DTO para resposta. */
     private FreteResponseDTO toDTO(Frete e) {
         return new FreteResponseDTO(
                 e.getId(),

@@ -3,7 +3,10 @@ package com.gabrielbatista.freteapi.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "ufs", uniqueConstraints = @UniqueConstraint(columnNames = "sigla"))
+@Table(
+        name = "ufs",
+        uniqueConstraints = @UniqueConstraint(name = "uk_ufs_sigla", columnNames = "sigla")
+)
 public class Uf {
 
     @Id
@@ -27,35 +30,12 @@ public class Uf {
         if (this.ativo == null) this.ativo = true;
     }
 
-    public Short getId() {
-        return id;
-    }
-
-    public void setId(Short id) {
-        this.id = id;
-    }
-
-    public String getSigla() {
-        return sigla;
-    }
-
-    public void setSigla(String sigla) {
-        this.sigla = sigla;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public Boolean getAtivo() {
-        return ativo;
-    }
-
-    public void setAtivo(Boolean ativo) {
-        this.ativo = ativo;
-    }
+    public Short getId() { return id; }
+    public void setId(Short id) { this.id = id; }
+    public String getSigla() { return sigla; }
+    public void setSigla(String sigla) { this.sigla = sigla; }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
 }
